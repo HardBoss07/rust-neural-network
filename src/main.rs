@@ -7,7 +7,14 @@ use egui::{Color32, Pos2};
 const BUFFER_SIZE: usize = 64;
 
 fn main() -> Result<(), eframe::Error> {
-    let options = eframe::NativeOptions::default();
+    let options = eframe::NativeOptions {
+        viewport: {
+            egui::ViewportBuilder::default()
+            .with_inner_size([800.0, 450.0])
+            .with_title("Shape Recognizer")
+        },
+        ..Default::default()
+    };
     eframe::run_native(
         "Shape Recognizer",
         options,
