@@ -45,43 +45,48 @@ impl eframe::App for MyApp {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("Draw your shape below:");
 
-            let available_size = ui.available_size();
-            let (response, painter) =
-                ui.allocate_painter(available_size, egui::Sense::drag());
+            let canvas_size = Vec2::new(400.0, 400.0);
+            egui::Frame::canvas(ui.style()).show(ui, |ui| {
+                ui.set_min_size(canvas_size);
 
-            let pointer_pos = response.interact_pointer_pos();
+                let (response, painter) =
+                    ui.allocate_painter(canvas_size, egui::Sense::drag());
 
-            if response.drag_started() {
-                self.is_drawing = true;
-                self.drawing.clear();
-                self.buffer = [[0; BUFFER_SIZE]; BUFFER_SIZE];
-            }
+                let pointer_pos = response.interact_pointer_pos();
 
-            if response.drag_stopped() {
-                self.is_drawing = false;
-            }
+                if response.drag_started() {
+                    self.is_drawing = true;
+                    self.drawing.clear();
+                    self.buffer = [[0; BUFFER_SIZE]; BUFFER_SIZE];
+                }
 
-            if self.is_drawing {
-                if let Some(pos) = pointer_pos {
-                    self.drawing.push(pos);
+                if response.drag_stopped() {
+                    self.is_drawing = false;
+                }
 
-                    let canvas_rect = response.rect;
-                    let rel_x = (pos.x - canvas_rect.left()) / canvas_rect.width();
-                    let rel_y = (pos.y - canvas_rect.top()) / canvas_rect.height();
+                if self.is_drawing {
+                    if let Some(pos) = pointer_pos {
+                        if response.rect.contains(pos) {
+                            self.drawing.push(pos);
 
-                    let x = (rel_x * BUFFER_SIZE as f32) as usize;
-                    let y = (rel_y * BUFFER_SIZE as f32) as usize;
+                            let rel_x = (pos.x - response.rect.left()) / response.rect.width();
+                            let rel_y = (pos.y - response.rect.top()) / response.rect.height();
 
-                    if x < BUFFER_SIZE && y < BUFFER_SIZE {
-                        self.buffer[y][x] = 255;
+                            let x = (rel_x * BUFFER_SIZE as f32) as usize;
+                            let y = (rel_y * BUFFER_SIZE as f32) as usize;
+
+                            if x < BUFFER_SIZE && y < BUFFER_SIZE {
+                                self.buffer[y][x] = 255;
+                            }
+                        }
                     }
                 }
-            }
 
-            for window in self.drawing.windows(2) {
-                let [p1, p2] = [window[0], window[1]];
-                painter.line_segment([p1, p2], egui::Stroke::new(2.0, Color32::WHITE));
-            }
+                for window in self.drawing.windows(2) {
+                    let [p1, p2] = [window[0], window[1]];
+                    painter.line_segment([p1, p2], egui::Stroke::new(2.0, Color32::WHITE));
+                }
+            });
 
             SidePanel::right("buffer_panel").show(ctx, |ui| {
                 ui.heading("Neural Net Output");
