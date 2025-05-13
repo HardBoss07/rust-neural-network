@@ -19,10 +19,10 @@ impl NeuralNetwork {
             .collect();
         let bias1 = vec![0.0; hidden_size];
 
-        let weight2 = (0..hidden_size)
-            .map(|_| (0..input_size).map(|_| rng.gen_range(-1.0..1.0)).collect())
+        let weight2 = (0..output_size)
+            .map(|_| (0..hidden_size).map(|_| rng.gen_range(-1.0..1.0)).collect())
             .collect();
-        let bias2 = vec![0.0; hidden_size];
+        let bias2 = vec![0.0; output_size];
 
         Self {
             input_size,
