@@ -35,7 +35,7 @@ impl Default for MyApp {
             drawing: Vec::new(),
             is_drawing: false,
             buffer: [[0; BUFFER_SIZE]; BUFFER_SIZE],
-            nn: NeuralNetwork::new(BUFFER_SIZE * BUFFER_SIZE, 64, 3),
+            nn: NeuralNetwork::new(BUFFER_SIZE * BUFFER_SIZE, 64, 3, true),
         }
     }
 }
@@ -105,6 +105,10 @@ impl eframe::App for MyApp {
                     });
                     ui.label(format!("{label}: {:.2}%", prob * 100.0));
                     ui.add(egui::widgets::ProgressBar::new(prob).show_percentage());
+                }
+
+                if ui.button("Write weights to file").clicked() {
+                    self.nn.write_weights();
                 }
 
                 ui.separator();
