@@ -1,4 +1,9 @@
 mod neuralnetwork;
+mod layer;
+mod neuron;
+
+use layer::Layer;
+use neuron::Neuron;
 use neuralnetwork::NeuralNetwork;
 
 use eframe::{egui, egui::Vec2, egui::SidePanel};
